@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 import uvicorn
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from testDatabase import companies
 
 app = FastAPI()
@@ -28,19 +28,20 @@ def get_company(company_id: int):
             return company
     raise HTTPException(status_code=404, detail="Company not found")
 
-class NewCompany(BaseModel):
+class companyScheme(BaseModel):
     company_name: str
-    inn: str
-    status: int
+    inn: str = Field(max_length=12)
+    status: int = Field(ge=1, le=4)
+    description: str | None = Field(max_length=255)
 
 @app.post("/companies",
           tags=["company-controller"],
           summary="create_company")
-def create_company(new_company: NewCompany):
+def create_company(company: companyScheme):
     companies.append({
         "id": len(companies) + 1,
-        "company_name": new_company.company_name,
-        "inn": new_company.inn,
-        "status": new_company.status
+        "company_name": company.company_name,
+        "inn": company.inn,
+        "status": company.status
     })
     return companies[-1]
