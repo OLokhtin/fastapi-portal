@@ -1,5 +1,4 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 # Database credentials
 POSTGRES_USER = "test_user"
@@ -17,13 +16,3 @@ SQLALCHEMY_DATABASE_URL = (
 # Create engine and session
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL)
 new_session = async_sessionmaker(engine, expire_on_commit=False)
-
-class BaseModel(DeclarativeBase):
-    pass
-
-class CompanyModel(BaseModel):
-    __tablename__ = "companies"
-    company_id: Mapped[int] = mapped_column(primary_key=True)
-    company_name: Mapped[str]
-    inn: Mapped[str]
-    status: Mapped[int]
