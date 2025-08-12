@@ -1,4 +1,7 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Annotated
+from fastapi import Depends
 
 # Database credentials
 POSTGRES_USER = "test_user"
@@ -16,3 +19,10 @@ SQLALCHEMY_DATABASE_URL = (
 # Create engine and session
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL)
 new_session = async_sessionmaker(engine, expire_on_commit=False)
+
+# Dependency for session
+async def get_session():
+    async with new_session() as session:
+        yield session
+
+SessionDep = Annotated[AsyncSession, Depends(get_session)]
