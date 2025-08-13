@@ -7,7 +7,7 @@ from src.schemas.companies import CompanyCreateScheme
 
 router = APIRouter()
 
-@router.get("/company",
+@router.get("/companies",
          tags=["company-controller"],
          summary="get_company")
 async def get_companies(session: SessionDep):

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список компаний</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .company-list {
+            margin-top: 20px;
+        }
+        .company {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+        }
+        .company-name {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+        .company-inn, .company-status {
+            color: #555;
+            margin-bottom: 3px;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #666;
+        }
+        .error {
+            color: #d32f2f;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .refresh-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .refresh-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Список компаний</h1>
+    <button class="refresh-btn" onclick="loadCompanies()">Обновить список</button>
+    <div id="company-container">
+        <div class="loading">Загрузка данных...</div>
+    </div>
+
+    <script>
+        async function loadCompanies() {
+            const container = document.getElementById('company-container');
+            container.innerHTML = '<div class="loading">Загрузка данных...</div>';
+
+            try {
+                const response = await fetch('http://localhost:8000/companies');
+
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP: ${response.status}`);
+                }
+
+                const companies = await response.json();
+
+                if (companies.length === 0) {
+                    container.innerHTML = '<div class="loading">Нет данных о компаниях</div>';
+                    return;
+                }
+
+                let html = '';
+                companies.forEach(company => {
+                    html += `
+                        <div class="company">
+                            <div class="company-name">${company.company_name}</div>
+                            <div class="company-inn">ИНН: ${company.inn}</div>
+                            <div class="company-status">Статус: ${company.status}</div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Ошибка при загрузке данных:', error);
+                container.innerHTML = `
+                    <div class="error">
+                        Произошла ошибка при загрузке данных: ${error.message}<br>
+                        Проверьте, запущен ли бэкенд-сервер по адресу http://localhost:8000
+                    </div>
+                `;
+            }
+        }
+
+        // Загружаем компании при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadCompanies);
+    </script>
+</body>
+</html>
