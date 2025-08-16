@@ -24,7 +24,7 @@ async def get_companies(
 @router.get("/companies/{company_id}",
             tags=["company-controller"],
             summary="get_company")
-async def get_companies(company_id:int, session: SessionDep):
+async def get_company(company_id:int, session: SessionDep):
     query = (select(CompanyModel)
              .filter(CompanyModel.company_id == company_id))
     result = await session.execute(query)
