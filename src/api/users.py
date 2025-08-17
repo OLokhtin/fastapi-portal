@@ -1,3 +1,5 @@
+import random
+
 from fastapi import APIRouter
 from sqlalchemy import select, update, delete
 
@@ -75,3 +77,14 @@ async def delete_user(user_id: int, session: SessionDep):
     await session.execute(query)
     await session.commit()
     return {"message":"No Content"}
+
+@router.delete("/api/users",
+          tags=["user-controller"],
+          summary="delete_random_user")
+async def delete_user(session: SessionDep):
+    user_id = random.randint(1, 10)
+    query = (delete(UserModel).
+             where(UserModel.user_id == user_id))
+    await session.execute(query)
+    #await session.commit()
+    return {"message": user_id}
