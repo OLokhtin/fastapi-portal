@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-from sqlalchemy import select
+from sqlalchemy import select, delete, update
 
 from src.api.dependencies import SessionDep, PaginationDep
 from src.models.companies import CompanyModel
-from src.schemas.companies import CompanyCreateScheme
+from src.schemas.companies import CompanyScheme
 
 router = APIRouter()
 
@@ -34,7 +34,7 @@ async def get_company(company_id:int, session: SessionDep):
           tags=["company-controller"],
           summary="create_company")
 async def create_company(
-        data: CompanyCreateScheme,
+        data: CompanyScheme,
         session: SessionDep
 ):
     new_company = CompanyModel(
@@ -45,3 +45,30 @@ async def create_company(
     session.add(new_company)
     await session.commit()
     return new_company
+
+@router.put("/companies/{company_id}",
+          tags=["company-controller"],
+          summary="update_company")
+async def update_company(
+        company_id: int,
+        data: CompanyScheme,
+        session: SessionDep
+):
+    query = ((update(CompanyModel).
+             where(CompanyModel.company_id == company_id)).
+             values(company_name=data.company_name,
+                    inn=data.inn,
+                    status=data.status))
+    await session.execute(query)
+    await session.commit()
+    return {"message":"OK"}
+
+@router.delete("/companies/{company_id}",
+          tags=["company-controller"],
+          summary="delete_company")
+async def delete_company(company_id: int, session: SessionDep):
+    query = (delete(CompanyModel).
+             where(CompanyModel.company_id == company_id))
+    await session.execute(query)
+    await session.commit()
+    return {"message":"No Content"}
