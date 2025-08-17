@@ -4,10 +4,11 @@ from sqlalchemy import select, update, delete
 from src.api.dependencies import SessionDep, PaginationDep
 from src.models.users import UserModel
 from src.schemas.users import UserScheme
+from src.security import hash_password
 
 router = APIRouter()
 
-@router.get("/users",
+@router.get("/api/users",
          tags=["user-controller"],
          summary="get_users")
 async def get_users(
@@ -21,7 +22,7 @@ async def get_users(
     result = await session.execute(query)
     return result.scalars().all()
 
-@router.get("/users/{user_id}",
+@router.get("/api/users/{user_id}",
             tags=["user-controller"],
             summary="get_user")
 async def get_user(user_id:int, session: SessionDep):
@@ -30,23 +31,25 @@ async def get_user(user_id:int, session: SessionDep):
     result = await session.execute(query)
     return result.scalars().first()
 
-@router.post("/users",
+@router.post("/api/users",
           tags=["user-controller"],
           summary="create_user")
 async def create_user(
         data: UserScheme,
         session: SessionDep
 ):
+
     new_user = UserModel(
         company_id = data.company_id,
         user_full_name = data.user_full_name,
-        user_email = data.user_email
+        user_email = data.user_email,
+        password = hash_password(data.password)
     )
     session.add(new_user)
     await session.commit()
     return new_user
 
-@router.put("/users/{user_id}",
+@router.put("/api/users/{user_id}",
           tags=["user-controller"],
           summary="update_user")
 async def update_user(
@@ -63,7 +66,7 @@ async def update_user(
     await session.commit()
     return {"message":"OK"}
 
-@router.delete("/users/{user_id}",
+@router.delete("/api/users/{user_id}",
           tags=["user-controller"],
           summary="delete_user")
 async def delete_user(user_id: int, session: SessionDep):

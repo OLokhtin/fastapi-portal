@@ -7,7 +7,7 @@ from src.schemas.companies import CompanyScheme
 
 router = APIRouter()
 
-@router.get("/companies",
+@router.get("/api/companies",
          tags=["company-controller"],
          summary="get_companies")
 async def get_companies(
@@ -21,7 +21,7 @@ async def get_companies(
     result = await session.execute(query)
     return result.scalars().all()
 
-@router.get("/companies/{company_id}",
+@router.get("/api/companies/{company_id}",
             tags=["company-controller"],
             summary="get_company")
 async def get_company(company_id:int, session: SessionDep):
@@ -30,7 +30,7 @@ async def get_company(company_id:int, session: SessionDep):
     result = await session.execute(query)
     return result.scalars().first()
 
-@router.post("/companies",
+@router.post("/api/companies",
           tags=["company-controller"],
           summary="create_company")
 async def create_company(
@@ -46,7 +46,7 @@ async def create_company(
     await session.commit()
     return new_company
 
-@router.put("/companies/{company_id}",
+@router.put("/api/companies/{company_id}",
           tags=["company-controller"],
           summary="update_company")
 async def update_company(
@@ -63,7 +63,7 @@ async def update_company(
     await session.commit()
     return {"message":"OK"}
 
-@router.delete("/companies/{company_id}",
+@router.delete("/api/companies/{company_id}",
           tags=["company-controller"],
           summary="delete_company")
 async def delete_company(company_id: int, session: SessionDep):

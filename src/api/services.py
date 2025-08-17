@@ -7,7 +7,7 @@ from src.schemas.services import ServiceScheme
 
 router = APIRouter()
 
-@router.get("/services",
+@router.get("/api/services",
          tags=["service-controller"],
          summary="get_services")
 async def get_services(
@@ -21,7 +21,7 @@ async def get_services(
     result = await session.execute(query)
     return result.scalars().all()
 
-@router.get("/services/{service_id}",
+@router.get("/api/services/{service_id}",
             tags=["service-controller"],
             summary="get_service")
 async def get_service(service_id:int, session: SessionDep):
@@ -30,7 +30,7 @@ async def get_service(service_id:int, session: SessionDep):
     result = await session.execute(query)
     return result.scalars().first()
 
-@router.post("/services",
+@router.post("/api/services",
           tags=["service-controller"],
           summary="create_service")
 async def create_service(
@@ -48,7 +48,7 @@ async def create_service(
     await session.commit()
     return new_service
 
-@router.put("/services/{service_id}",
+@router.put("/api/services/{service_id}",
           tags=["service-controller"],
           summary="update_service")
 async def update_service(
@@ -67,7 +67,7 @@ async def update_service(
     await session.commit()
     return {"message":"OK"}
 
-@router.delete("/services/{service_id}",
+@router.delete("/api/services/{service_id}",
           tags=["service-controller"],
           summary="delete_service")
 async def delete_service(service_id: int, session: SessionDep):
