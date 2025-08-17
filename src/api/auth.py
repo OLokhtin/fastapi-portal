@@ -26,8 +26,12 @@ async def create_user(creds: AuthScheme,
     query = (select(UserModel)
              .filter(UserModel.user_email == creds.email))
     result = await session.execute(query)
-    if result.scalars().first() is None:
-        raise HTTPException(status_code=401, detail="User not found")
+    user = result.scalars().first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
     else:
-        token = security.create_access_token(uid="123")
-        return {"token": token}
+        if user.user_email == creds.password:
+            token = security.create_access_token(uid="123")
+            return {"token": token}
+        else:
+            raise HTTPException(status_code=401, detail="Incorrect password")
