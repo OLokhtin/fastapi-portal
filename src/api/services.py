@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-from sqlalchemy import select
+from sqlalchemy import select, update, delete
 
 from src.api.dependencies import SessionDep, PaginationDep
 from src.models.services import ServiceModel
-from src.schemas.services import ServiceCreateScheme
+from src.schemas.services import ServiceScheme
 
 router = APIRouter()
 
@@ -34,7 +34,7 @@ async def get_service(service_id:int, session: SessionDep):
           tags=["service-controller"],
           summary="create_service")
 async def create_service(
-        data: ServiceCreateScheme,
+        data: ServiceScheme,
         session: SessionDep
 ):
     new_service = ServiceModel(
@@ -47,3 +47,32 @@ async def create_service(
     session.add(new_service)
     await session.commit()
     return new_service
+
+@router.put("/services/{service_id}",
+          tags=["service-controller"],
+          summary="update_service")
+async def update_service(
+        service_id: int,
+        data: ServiceScheme,
+        session: SessionDep
+):
+    query = ((update(ServiceModel).
+             where(ServiceModel.service_id == service_id)).
+             values(company_id = data.company_id,
+                    service_name = data.service_name,
+                    service_start_date = data.service_start_date,
+                    service_end_date = data.service_end_date,
+                    service_type = data.service_type))
+    await session.execute(query)
+    await session.commit()
+    return {"message":"OK"}
+
+@router.delete("/services/{service_id}",
+          tags=["service-controller"],
+          summary="delete_service")
+async def delete_service(service_id: int, session: SessionDep):
+    query = (delete(ServiceModel).
+             where(ServiceModel.service_id == service_id))
+    await session.execute(query)
+    await session.commit()
+    return {"message":"No Content"}
