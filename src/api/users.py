@@ -1,0 +1,74 @@
+from fastapi import APIRouter
+from sqlalchemy import select, update, delete
+
+from src.api.dependencies import SessionDep, PaginationDep
+from src.models.users import UserModel
+from src.schemas.users import UserScheme
+
+router = APIRouter()
+
+@router.get("/users",
+         tags=["user-controller"],
+         summary="get_users")
+async def get_users(
+        session: SessionDep,
+        pagination: PaginationDep
+):
+    query = (select(UserModel)
+             .limit(pagination.limit)
+             .offset(pagination.offset)
+     )
+    result = await session.execute(query)
+    return result.scalars().all()
+
+@router.get("/users/{user_id}",
+            tags=["user-controller"],
+            summary="get_user")
+async def get_user(user_id:int, session: SessionDep):
+    query = (select(UserModel)
+             .filter(UserModel.user_id == user_id))
+    result = await session.execute(query)
+    return result.scalars().first()
+
+@router.post("/users",
+          tags=["user-controller"],
+          summary="create_user")
+async def create_user(
+        data: UserScheme,
+        session: SessionDep
+):
+    new_user = UserModel(
+        company_id = data.company_id,
+        user_full_name = data.user_full_name,
+        user_email = data.user_email
+    )
+    session.add(new_user)
+    await session.commit()
+    return new_user
+
+@router.put("/users/{user_id}",
+          tags=["user-controller"],
+          summary="update_user")
+async def update_user(
+        user_id: int,
+        data: UserScheme,
+        session: SessionDep
+):
+    query = ((update(UserModel).
+             where(UserModel.user_id == user_id)).
+             values(company_id = data.company_id,
+                    user_full_name = data.user_full_name,
+                    user_email = data.user_email))
+    await session.execute(query)
+    await session.commit()
+    return {"message":"OK"}
+
+@router.delete("/users/{user_id}",
+          tags=["user-controller"],
+          summary="delete_user")
+async def delete_user(user_id: int, session: SessionDep):
+    query = (delete(UserModel).
+             where(UserModel.user_id == user_id))
+    await session.execute(query)
+    await session.commit()
+    return {"message":"No Content"}
