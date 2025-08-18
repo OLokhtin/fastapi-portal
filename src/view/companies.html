@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Компании</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; position: relative; }
         nav { display: flex; margin-bottom: 20px; }
         nav a { margin-right: 15px; padding: 5px; text-decoration: none; color: #333; }
         nav a.active { font-weight: bold; border-bottom: 2px solid #333; }
@@ -25,6 +25,31 @@
             transition: background-color 0.3s;
         }
         #logoutBtn:hover { background-color: #d32f2f; }
+        #addCompanyBtn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        #addCompanyBtn:hover { background-color: #45a049; }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .iframe-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 1000;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -36,7 +61,11 @@
 
     <button id="logoutBtn">Выйти</button>
 
-    <h1>Список компаний</h1>
+    <div class="header-container">
+        <h1>Список компаний</h1>
+        <button id="addCompanyBtn">Добавить компанию</button>
+    </div>
+
     <table id="companiesTable">
         <thead>
             <tr>
@@ -49,11 +78,32 @@
         <tbody></tbody>
     </table>
 
+    <iframe id="modalIframe" class="iframe-modal"></iframe>
+
     <script>
+        let modalIframe = document.getElementById('modalIframe');
+
+        // Кнопка добавления компании
+        document.getElementById('addCompanyBtn').addEventListener('click', () => {
+            modalIframe.src = 'add_company_modal.html';
+            modalIframe.style.display = 'block';
+        });
+
+        // Обработчик сообщений от модального окна
+        window.addEventListener('message', (event) => {
+            if (event.data.action === 'closeModal') {
+                modalIframe.style.display = 'none';
+                modalIframe.src = '';
+            } else if (event.data.action === 'companyAdded') {
+                loadCompanies(); // Перезагружаем список компаний
+            }
+        });
+
+        // Остальной код остается без изменений
         async function loadCompanies() {
             try {
                 const response = await fetch('http://localhost:8000/api/companies', {
-                    credentials: 'include' // Важно для отправки кук
+                    credentials: 'include'
                 });
 
                 if (response.status === 401) {
@@ -81,7 +131,6 @@
             }
         }
 
-        // Обработчик кнопки выхода
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             if (confirm('Вы уверены, что хотите выйти?')) {
                 try {
@@ -100,6 +149,7 @@
                 }
             }
         });
+
         document.addEventListener('DOMContentLoaded', loadCompanies);
     </script>
 </body>
