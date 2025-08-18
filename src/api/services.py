@@ -9,7 +9,8 @@ router = APIRouter()
 
 @router.get("/api/services",
          tags=["service-controller"],
-         summary="get_services")
+         summary="get_services"
+            )
 async def get_services(
         session: SessionDep,
         pagination: PaginationDep
@@ -23,16 +24,19 @@ async def get_services(
 
 @router.get("/api/services/{service_id}",
             tags=["service-controller"],
-            summary="get_service")
+            summary="get_service"
+            )
 async def get_service(service_id:int, session: SessionDep):
     query = (select(ServiceModel)
-             .filter(ServiceModel.service_id == service_id))
+             .filter(ServiceModel.service_id == service_id)
+             )
     result = await session.execute(query)
     return result.scalars().first()
 
 @router.post("/api/services",
           tags=["service-controller"],
-          summary="create_service")
+          summary="create_service"
+             )
 async def create_service(
         data: ServiceScheme,
         session: SessionDep
@@ -50,7 +54,8 @@ async def create_service(
 
 @router.put("/api/services/{service_id}",
           tags=["service-controller"],
-          summary="update_service")
+          summary="update_service"
+            )
 async def update_service(
         service_id: int,
         data: ServiceScheme,
@@ -62,17 +67,20 @@ async def update_service(
                     service_name = data.service_name,
                     service_start_date = data.service_start_date,
                     service_end_date = data.service_end_date,
-                    service_type = data.service_type))
+                    service_type = data.service_type)
+             )
     await session.execute(query)
     await session.commit()
     return {"message":"OK"}
 
 @router.delete("/api/services/{service_id}",
           tags=["service-controller"],
-          summary="delete_service")
+          summary="delete_service"
+               )
 async def delete_service(service_id: int, session: SessionDep):
     query = (delete(ServiceModel).
-             where(ServiceModel.service_id == service_id))
+             where(ServiceModel.service_id == service_id)
+             )
     await session.execute(query)
     await session.commit()
     return {"message":"No Content"}

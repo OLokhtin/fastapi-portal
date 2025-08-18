@@ -12,7 +12,8 @@ router = APIRouter()
 
 @router.get("/api/users",
          tags=["user-controller"],
-         summary="get_users")
+         summary="get_users"
+            )
 async def get_users(
         session: SessionDep,
         pagination: PaginationDep
@@ -26,16 +27,19 @@ async def get_users(
 
 @router.get("/api/users/{user_id}",
             tags=["user-controller"],
-            summary="get_user")
+            summary="get_user"
+            )
 async def get_user(user_id:int, session: SessionDep):
     query = (select(UserModel)
-             .filter(UserModel.user_id == user_id))
+             .filter(UserModel.user_id == user_id)
+             )
     result = await session.execute(query)
     return result.scalars().first()
 
 @router.post("/api/users",
           tags=["user-controller"],
-          summary="create_user")
+          summary="create_user"
+             )
 async def create_user(
         data: UserScheme,
         session: SessionDep
@@ -63,28 +67,33 @@ async def update_user(
              where(UserModel.user_id == user_id)).
              values(company_id = data.company_id,
                     user_full_name = data.user_full_name,
-                    user_email = data.user_email))
+                    user_email = data.user_email)
+             )
     await session.execute(query)
     await session.commit()
     return {"message":"OK"}
 
 @router.delete("/api/users/{user_id}",
           tags=["user-controller"],
-          summary="delete_user")
+          summary="delete_user"
+               )
 async def delete_user(user_id: int, session: SessionDep):
     query = (delete(UserModel).
-             where(UserModel.user_id == user_id))
+             where(UserModel.user_id == user_id)
+             )
     await session.execute(query)
     await session.commit()
     return {"message":"No Content"}
 
 @router.delete("/api/users",
           tags=["user-controller"],
-          summary="delete_random_user")
+          summary="delete_random_user"
+               )
 async def delete_user(session: SessionDep):
     user_id = random.randint(1, 10)
     query = (delete(UserModel).
-             where(UserModel.user_id == user_id))
+             where(UserModel.user_id == user_id)
+             )
     await session.execute(query)
     #await session.commit()
     return {"message": user_id}
