@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Компании</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        nav { display: flex; margin-bottom: 20px; }
+        nav a { margin-right: 15px; padding: 5px; text-decoration: none; color: #333; }
+        nav a.active { font-weight: bold; border-bottom: 2px solid #333; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="companies.html" class="active">Компании</a>
+        <a href="services.html">Сервисы</a>
+    </nav>
+
+    <h1>Список компаний</h1>
+    <table id="companiesTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>ИНН</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        async function loadCompanies() {
+            try {
+                const response = await fetch('http://localhost:8000/api/companies', {
+                    credentials: 'include' // Важно для отправки кук
+                });
+
+                if (response.status === 401) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                const companies = await response.json();
+
+                const tbody = document.querySelector('#companiesTable tbody');
+                tbody.innerHTML = '';
+
+                companies.forEach(company => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${company.company_id}</td>
+                        <td>${company.company_name}</td>
+                        <td>${company.inn}</td>
+                        <td>${company.status}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error('Ошибка загрузки компаний:', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadCompanies);
+    </script>
+</body>
+</html>

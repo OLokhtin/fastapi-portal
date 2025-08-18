@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сервисы</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        nav { display: flex; margin-bottom: 20px; }
+        nav a { margin-right: 15px; padding: 5px; text-decoration: none; color: #333; }
+        nav a.active { font-weight: bold; border-bottom: 2px solid #333; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="companies.html">Компании</a>
+        <a href="services.html" class="active">Сервисы</a>
+    </nav>
+
+    <h1>Список сервисов</h1>
+    <table id="servicesTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>ID компании</th>
+                <th>Название</th>
+                <th>Дата начала</th>
+                <th>Дата окончания</th>
+                <th>Тип</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        async function loadServices() {
+            try {
+                const response = await fetch('http://localhost:8000/api/services', {
+                    credentials: 'include'  // Важно для отправки кук
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '../index.html';  // Редирект если не авторизован
+                        return;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                const tbody = document.querySelector('#servicesTable tbody');
+                tbody.innerHTML = '';
+
+                if (Array.isArray(data)) {  // Проверка что данные - массив
+                    data.forEach(service => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${service.service_id}</td>
+                            <td>${service.company_id}</td>
+                            <td>${service.service_name}</td>
+                            <td>${service.service_start_date}</td>
+                            <td>${service.service_end_date}</td>
+                            <td>${service.service_type}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    console.error("Данные не являются массивом:", data);
+                }
+            } catch (err) {
+                console.error('Ошибка загрузки сервисов:', err);
+                alert('Ошибка загрузки данных. Проверьте консоль для деталей.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadServices);
+    </script>
+</body>
+</html>

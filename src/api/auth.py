@@ -31,7 +31,7 @@ async def login_user(creds: AuthScheme,
             response.set_cookie(key=config.JWT_ACCESS_COOKIE_NAME,
                                 value=token
                                 )
-            return {"message": "Successfully logged in", "token": token}
+            return {"message": "Successfully logged in"}
         else:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail="Incorrect password"
