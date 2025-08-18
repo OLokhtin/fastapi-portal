@@ -1,15 +1,16 @@
 from fastapi import APIRouter
 from sqlalchemy import select, update, delete
 
-from src.api.dependencies import SessionDep, PaginationDep
+from src.api.dependencies import SessionDep, PaginationDep, AuthDep
 from src.models.services import ServiceModel
 from src.schemas.services import ServiceScheme
 
 router = APIRouter()
 
 @router.get("/api/services",
-         tags=["service-controller"],
-         summary="get_services"
+            tags=["service-controller"],
+            summary="get_services",
+            dependencies=[AuthDep]
             )
 async def get_services(
         session: SessionDep,
@@ -24,7 +25,8 @@ async def get_services(
 
 @router.get("/api/services/{service_id}",
             tags=["service-controller"],
-            summary="get_service"
+            summary="get_service",
+            dependencies=[AuthDep]
             )
 async def get_service(service_id:int, session: SessionDep):
     query = (select(ServiceModel)
@@ -34,8 +36,9 @@ async def get_service(service_id:int, session: SessionDep):
     return result.scalars().first()
 
 @router.post("/api/services",
-          tags=["service-controller"],
-          summary="create_service"
+             tags=["service-controller"],
+             summary="create_service",
+             dependencies=[AuthDep]
              )
 async def create_service(
         data: ServiceScheme,
@@ -53,8 +56,9 @@ async def create_service(
     return new_service
 
 @router.put("/api/services/{service_id}",
-          tags=["service-controller"],
-          summary="update_service"
+            tags=["service-controller"],
+            summary="update_service",
+            dependencies=[AuthDep]
             )
 async def update_service(
         service_id: int,
@@ -74,8 +78,9 @@ async def update_service(
     return {"message":"OK"}
 
 @router.delete("/api/services/{service_id}",
-          tags=["service-controller"],
-          summary="delete_service"
+               tags=["service-controller"],
+               summary="delete_service",
+               dependencies=[AuthDep]
                )
 async def delete_service(service_id: int, session: SessionDep):
     query = (delete(ServiceModel).

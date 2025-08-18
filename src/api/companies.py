@@ -1,15 +1,16 @@
 from fastapi import APIRouter
 from sqlalchemy import select, delete, update
 
-from src.api.dependencies import SessionDep, PaginationDep
+from src.api.dependencies import SessionDep, PaginationDep, AuthDep
 from src.models.companies import CompanyModel
 from src.schemas.companies import CompanyScheme
 
 router = APIRouter()
 
 @router.get("/api/companies",
-         tags=["company-controller"],
-         summary="get_companies"
+            tags=["company-controller"],
+            summary="get_companies",
+            dependencies=[AuthDep]
             )
 async def get_companies(
         session: SessionDep,
@@ -24,7 +25,8 @@ async def get_companies(
 
 @router.get("/api/companies/{company_id}",
             tags=["company-controller"],
-            summary="get_company"
+            summary="get_company",
+            dependencies=[AuthDep]
             )
 async def get_company(company_id:int, session: SessionDep):
     query = (select(CompanyModel)
@@ -34,8 +36,9 @@ async def get_company(company_id:int, session: SessionDep):
     return result.scalars().first()
 
 @router.post("/api/companies",
-          tags=["company-controller"],
-          summary="create_company"
+             tags=["company-controller"],
+             summary="create_company",
+             dependencies=[AuthDep]
              )
 async def create_company(
         data: CompanyScheme,
@@ -51,8 +54,9 @@ async def create_company(
     return new_company
 
 @router.put("/api/companies/{company_id}",
-          tags=["company-controller"],
-          summary="update_company"
+            tags=["company-controller"],
+            summary="update_company",
+            dependencies=[AuthDep]
             )
 async def update_company(
         company_id: int,
@@ -70,8 +74,9 @@ async def update_company(
     return {"message":"OK"}
 
 @router.delete("/api/companies/{company_id}",
-          tags=["company-controller"],
-          summary="delete_company"
+               tags=["company-controller"],
+               summary="delete_company",
+               dependencies=[AuthDep]
                )
 async def delete_company(company_id: int, session: SessionDep):
     query = (delete(CompanyModel).

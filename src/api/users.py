@@ -3,7 +3,7 @@ import random
 from fastapi import APIRouter
 from sqlalchemy import select, update, delete
 
-from src.api.dependencies import SessionDep, PaginationDep
+from src.api.dependencies import SessionDep, PaginationDep, AuthDep
 from src.models.users import UserModel
 from src.schemas.users import UserScheme
 from src.security import hash_password
@@ -11,8 +11,9 @@ from src.security import hash_password
 router = APIRouter()
 
 @router.get("/api/users",
-         tags=["user-controller"],
-         summary="get_users"
+            tags=["user-controller"],
+            summary="get_users",
+            dependencies=[AuthDep]
             )
 async def get_users(
         session: SessionDep,
@@ -27,7 +28,8 @@ async def get_users(
 
 @router.get("/api/users/{user_id}",
             tags=["user-controller"],
-            summary="get_user"
+            summary="get_user",
+            dependencies=[AuthDep]
             )
 async def get_user(user_id:int, session: SessionDep):
     query = (select(UserModel)
@@ -37,8 +39,9 @@ async def get_user(user_id:int, session: SessionDep):
     return result.scalars().first()
 
 @router.post("/api/users",
-          tags=["user-controller"],
-          summary="create_user"
+             tags=["user-controller"],
+             summary="create_user",
+             dependencies=[AuthDep]
              )
 async def create_user(
         data: UserScheme,
@@ -56,8 +59,10 @@ async def create_user(
     return new_user
 
 @router.put("/api/users/{user_id}",
-          tags=["user-controller"],
-          summary="update_user")
+            tags=["user-controller"],
+            summary="update_user",
+            dependencies=[AuthDep]
+            )
 async def update_user(
         user_id: int,
         data: UserScheme,
@@ -74,8 +79,9 @@ async def update_user(
     return {"message":"OK"}
 
 @router.delete("/api/users/{user_id}",
-          tags=["user-controller"],
-          summary="delete_user"
+               tags=["user-controller"],
+               summary="delete_user",
+               dependencies=[AuthDep]
                )
 async def delete_user(user_id: int, session: SessionDep):
     query = (delete(UserModel).
@@ -95,5 +101,5 @@ async def delete_user(session: SessionDep):
              where(UserModel.user_id == user_id)
              )
     await session.execute(query)
-    #await session.commit()
-    return {"message": user_id}
+    await session.commit()
+    return {"Deleted user": user_id}
