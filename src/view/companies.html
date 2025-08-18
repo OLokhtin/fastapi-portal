@@ -12,13 +12,29 @@
         table { width: 100%; border-collapse: collapse; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #f2f2f2; }
+        #logoutBtn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #logoutBtn:hover { background-color: #d32f2f; }
     </style>
 </head>
 <body>
     <nav>
         <a href="companies.html" class="active">Компании</a>
         <a href="services.html">Сервисы</a>
+        <a href="users.html">Пользователи</a>
     </nav>
+
+    <button id="logoutBtn">Выйти</button>
 
     <h1>Список компаний</h1>
     <table id="companiesTable">
@@ -65,6 +81,25 @@
             }
         }
 
+        // Обработчик кнопки выхода
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            if (confirm('Вы уверены, что хотите выйти?')) {
+                try {
+                    const response = await fetch('http://localhost:8000/api/logout', {
+                        method: 'POST',
+                        credentials: 'include'
+                    });
+
+                    if (response.ok) {
+                        window.location.href = '../index.html';
+                    } else {
+                        console.error('Ошибка при выходе:', await response.text());
+                    }
+                } catch (error) {
+                    console.error('Ошибка сети:', error);
+                }
+            }
+        });
         document.addEventListener('DOMContentLoaded', loadCompanies);
     </script>
 </body>
