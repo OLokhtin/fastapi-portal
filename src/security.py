@@ -10,8 +10,9 @@ config.JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 config.JWT_ACCESS_COOKIE_NAME = "X-Access-Token"
 config.JWT_TOKEN_LOCATION = ["cookies"]
 config.JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=60)
-config.JWT_COOKIE_SECURE = False
+config.JWT_COOKIE_SECURE = False # HTTP - False
 config.JWT_COOKIE_SAMESITE = "lax"
+config.JWT_COOKIE_CSRF_PROTECT = False
 
 security = AuthX(config=config)
 
