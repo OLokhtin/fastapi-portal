@@ -9,4 +9,7 @@ class UserModel(Base):
     company_id: Mapped[int] = mapped_column(ForeignKey("companies.company_id"))
     user_full_name: Mapped[str]
     user_email: Mapped[str]
+
+class CreateUserModel(UserModel):
     password: Mapped[str]
+

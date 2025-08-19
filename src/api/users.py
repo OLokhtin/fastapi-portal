@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from sqlalchemy import select, update, delete
 
 from src.api.dependencies import SessionDep, PaginationDep, AuthDep
-from src.models.users import UserModel
+from src.models.users import UserModel, CreateUserModel
 from src.schemas.users import UserScheme
 from src.security import hash_password
 
@@ -22,7 +22,7 @@ async def get_users(
     query = (select(UserModel)
              .limit(pagination.limit)
              .offset(pagination.offset)
-     )
+             )
     result = await session.execute(query)
     return result.scalars().all()
 
@@ -48,7 +48,7 @@ async def create_user(
         session: SessionDep
 ):
 
-    new_user = UserModel(
+    new_user = CreateUserModel(
         company_id = data.company_id,
         user_full_name = data.user_full_name,
         user_email = data.user_email,
@@ -92,8 +92,8 @@ async def delete_user(user_id: int, session: SessionDep):
     return {"message":"No Content"}
 
 @router.delete("/api/users",
-          tags=["user-controller"],
-          summary="delete_random_user"
+               tags=["user-controller"],
+               summary="delete_random_user"
                )
 async def delete_user(session: SessionDep):
     user_id = random.randint(1, 10)
