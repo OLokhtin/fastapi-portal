@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, func
 
 from src.api.dependencies import SessionDep, PaginationDep, AuthDep
 from src.models.services import ServiceModel
@@ -89,3 +89,18 @@ async def delete_service(service_id: int, session: SessionDep):
     await session.execute(query)
     await session.commit()
     return {"message":"No Content"}
+
+@router.delete("/api/services",
+               tags=["service-controller"],
+               summary="delete_last_service"
+               )
+async def delete_service(session: SessionDep):
+    query = select(func.max(ServiceModel.service_id))
+    result = await session.execute(query)
+    service_id = result.scalar()
+    query = (delete(ServiceModel).
+             where(ServiceModel.service_id == service_id)
+             )
+    await session.execute(query)
+    await session.commit()
+    return {"Deleted service": service_id}

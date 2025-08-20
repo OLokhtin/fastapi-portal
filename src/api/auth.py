@@ -9,8 +9,8 @@ from src.security import verify_password, security, config, hash_password
 router = APIRouter()
 
 @router.post("/api/login",
-          tags=["auth-controller"],
-          summary="login_user"
+             tags=["auth-controller"],
+             summary="login_user"
              )
 async def login_user(creds: AuthScheme,
                      session: SessionDep,
