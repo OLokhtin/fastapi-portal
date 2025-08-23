@@ -90,11 +90,11 @@ async def delete_service(service_id: int, session: SessionDep):
     await session.commit()
     return {"message":"No Content"}
 
-@router.delete("/api/services",
+@router.delete("/api/delete_last_service",
                tags=["service-controller"],
                summary="delete_last_service"
                )
-async def delete_service(session: SessionDep):
+async def delete_last_service(session: SessionDep):
     query = select(func.max(ServiceModel.service_id))
     result = await session.execute(query)
     service_id = result.scalar()
