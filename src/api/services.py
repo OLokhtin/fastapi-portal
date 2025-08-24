@@ -9,7 +9,8 @@ router = APIRouter()
 
 @router.get("/api/services",
             tags=["service-controller"],
-            summary="get_services"
+            summary="get_services",
+            dependencies=[AuthDep]
             )
 async def get_services(
         session: SessionDep,
@@ -36,7 +37,8 @@ async def get_service(service_id:int, session: SessionDep):
 
 @router.post("/api/services",
              tags=["service-controller"],
-             summary="create_service"
+             summary="create_service",
+             dependencies=[AuthDep]
              )
 async def create_service(
         data: ServiceScheme,
@@ -90,7 +92,8 @@ async def delete_service(service_id: int, session: SessionDep):
 
 @router.delete("/api/delete_last_service",
                tags=["service-controller"],
-               summary="delete_last_service"
+               summary="delete_last_service",
+               dependencies=[AuthDep]
                )
 async def delete_last_service(session: SessionDep):
     query = select(func.max(ServiceModel.service_id))

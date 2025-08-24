@@ -9,7 +9,8 @@ router = APIRouter()
 
 @router.get("/api/companies",
             tags=["company-controller"],
-            summary="get_companies"
+            summary="get_companies",
+            dependencies=[AuthDep]
             )
 async def get_companies(
         session: SessionDep,
@@ -36,7 +37,8 @@ async def get_company(company_id:int, session: SessionDep):
 
 @router.post("/api/companies",
              tags=["company-controller"],
-             summary="create_company"
+             summary="create_company",
+             dependencies=[AuthDep]
              )
 async def create_company(
         data: CompanyScheme,
