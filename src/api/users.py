@@ -10,8 +10,7 @@ router = APIRouter()
 
 @router.get("/api/users",
             tags=["user-controller"],
-            summary="get_users",
-            dependencies=[AuthDep]
+            summary="get_users"
             )
 async def get_users(
         session: SessionDep,
@@ -38,8 +37,7 @@ async def get_user(user_id:int, session: SessionDep):
 
 @router.post("/api/users",
              tags=["user-controller"],
-             summary="create_user",
-             dependencies=[AuthDep]
+             summary="create_user"
              )
 async def create_user(
         data: UserScheme,

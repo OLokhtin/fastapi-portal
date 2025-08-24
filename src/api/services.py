@@ -9,8 +9,7 @@ router = APIRouter()
 
 @router.get("/api/services",
             tags=["service-controller"],
-            summary="get_services",
-            dependencies=[AuthDep]
+            summary="get_services"
             )
 async def get_services(
         session: SessionDep,
@@ -37,8 +36,7 @@ async def get_service(service_id:int, session: SessionDep):
 
 @router.post("/api/services",
              tags=["service-controller"],
-             summary="create_service",
-             dependencies=[AuthDep]
+             summary="create_service"
              )
 async def create_service(
         data: ServiceScheme,

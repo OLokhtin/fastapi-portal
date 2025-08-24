@@ -36,8 +36,7 @@ async def get_company(company_id:int, session: SessionDep):
 
 @router.post("/api/companies",
              tags=["company-controller"],
-             summary="create_company",
-             dependencies=[AuthDep]
+             summary="create_company"
              )
 async def create_company(
         data: CompanyScheme,
