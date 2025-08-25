@@ -1,5 +1,7 @@
-from pydantic import BaseModel, Field
+from typing import Optional
+
+from pydantic import BaseModel
 
 class PaginationSchema(BaseModel):
-    limit: int = Field(10, ge= 10, le=100)
-    offset: int = Field(0, ge= 0)
+    limit: Optional[int] = None
+    offset: Optional[int] = None

@@ -83,11 +83,3 @@ async def change_password(data: ChangePassScheme,
 async def logout_user(response: Response):
     response.delete_cookie(key=config.JWT_ACCESS_COOKIE_NAME)
     return {"message": "Successfully logged out"}
-
-@router.get("/api/secret_data",
-            tags=["auth-controller"],
-            summary="get_secret_data",
-            dependencies=[AuthDep]
-            )
-def get_secret_data():
-    return {"message": "secret data"}
