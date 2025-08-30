@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import select, update, delete
 
 from src.api.dependencies import SessionDep, PaginationDep, AuthDep
@@ -34,7 +34,12 @@ async def get_user(user_id:int, session: SessionDep):
              .filter(UserModel.user_id == user_id)
              )
     result = await session.execute(query)
-    return result.scalars().first()
+    user = result.scalars().first()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Company not found"
+                            )
+    return user
 
 @router.post("/api/users",
              tags=["user-controller"],
@@ -52,6 +57,7 @@ async def create_user(
         password = hash_password(data.password)
     )
     session.add(new_user)
+    await session.flush()
     await session.commit()
     return new_user
 
@@ -69,11 +75,17 @@ async def update_user(
              where(UserModel.user_id == user_id)).
              values(company_id = data.company_id,
                     user_full_name = data.user_full_name,
-                    user_email = data.user_email)
+                    user_email = data.user_email).
+             returning(UserModel)
              )
-    await session.execute(query)
+    result = await session.execute(query)
+    updated_user = result.scalars().first()
+    if updated_user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="User not found"
+                            )
     await session.commit()
-    return {"message":"OK"}
+    return updated_user
 
 @router.delete("/api/users/{user_id}",
                tags=["user-controller"],

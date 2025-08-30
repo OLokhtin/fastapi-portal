@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import select, update, delete, func
 
 from src.api.dependencies import SessionDep, PaginationDep, AuthDep
@@ -33,7 +33,12 @@ async def get_service(service_id:int, session: SessionDep):
              .filter(ServiceModel.service_id == service_id)
              )
     result = await session.execute(query)
-    return result.scalars().first()
+    service = result.scalars().first()
+    if service is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Company not found"
+                            )
+    return service
 
 @router.post("/api/services",
              tags=["service-controller"],
@@ -52,6 +57,7 @@ async def create_service(
         service_type = data.service_type
     )
     session.add(new_service)
+    await session.flush()
     await session.commit()
     return new_service
 
@@ -71,11 +77,17 @@ async def update_service(
                     service_name = data.service_name,
                     service_start_date = data.service_start_date,
                     service_end_date = data.service_end_date,
-                    service_type = data.service_type)
+                    service_type = data.service_type).
+             returning(ServiceModel)
              )
-    await session.execute(query)
+    result = await session.execute(query)
+    updated_service = result.scalars().first()
+    if updated_service is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Company not found"
+                            )
     await session.commit()
-    return {"message":"OK"}
+    return updated_service
 
 @router.delete("/api/services/{service_id}",
                tags=["service-controller"],
